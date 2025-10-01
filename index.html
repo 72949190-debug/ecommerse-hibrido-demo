@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&J e-Commerce Híbrido B2B/B2C - Perú</title>
+    <style>
+        /* Estilos CSS */
+        :root {
+            --color-b2b: #007bff; /* Azul corporativo */
+            --color-b2c: #ff5722; /* Naranja vibrante para retail */
+            --color-bg: #f8f9fa;
+            --color-text: #333;
+            --color-accent: #28a745; /* Verde para acciones */
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+        }
+
+        header {
+            background-color: #343a40;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--color-b2b);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 20px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .product-list {
+            flex: 3;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .price-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+            border-radius: 50px;
+            background-color: #eee;
+            padding: 5px;
+        }
+
+        .price-toggle button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+            flex-grow: 1;
+        }
+
+        .price-toggle .b2c.active {
+            background-color: var(--color-b2c);
+            color: white;
+        }
+
+        .price-toggle .b2b.active {
+            background-color: var(--color-b2b);
+            color: white;
+        }
+
+        .price-display {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .b2b-price {
+            color: var(--color-b2b);
+        }
+
+        .b2c-price {
+            color: var(--color-b2c);
+        }
+
+        .discount-badge {
+            display: inline-block;
+            background-color: red;
+            color: white;
+            font-size: 0.8em;
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+
+        .add-to-cart {
+            background-color: var(--color-accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 10px;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+
+        .add-to-cart:hover {
+            background-color: #1e7e34;
+        }
+
+        .cart-sidebar {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+        }
+
+        .cart-sidebar h2 {
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        #cart-items {
+            list-style: none;
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        #cart-items li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #eee;
+            padding: 10px 0;
+        }
+
+        .item-details {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .item-details .price-type {
+            font-size: 0.8em;
+            color: gray;
+        }
+
+        .item-quantity input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 3px;
+        }
+
+        .remove-item {
+            background: none;
+            border: none;
+            color: red;
+            cursor: pointer;
+            margin-left: 10px;
+            font-size: 1.2em;
+        }
+
+        .cart-summary div {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 5px;
+            border-top: 1px solid #ddd;
+        }
+
+        #checkout-form label,
+        #checkout-form input,
+        #checkout-form textarea {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #checkout-form input:not([type="checkbox"]),
+        #checkout-form textarea {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .checkout-button {
+            background-color: var(--color-b2c);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            width: 100%;
+            margin-top: 15px;
+            transition: background-color 0.3s;
+        }
+
+        .checkout-button:hover {
+            background-color: #e04a1a;
+        }
+
+        /* Colores para el tipo de cliente en el carrito */
+        .b2c-label { color: var(--color-b2c); font-weight: normal; }
+        .b2b-label { color: var(--color-b2b); font-weight: normal; }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            .cart-sidebar {
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>T&J Digital - E-Commerce Híbrido B2B/B2C</h1>
+        <div class="price-toggle-site">
+            <button id="toggle-b2c" class="b2c active" onclick="setGlobalMode('B2C')">COMPRA RETAIL</button>
+            <button id="toggle-b2b" class="b2b" onclick="setGlobalMode('B2B')">MAYORISTA (B2B)</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="product-list" id="product-list"></section>
+
+        <aside class="cart-sidebar">
+            <h2>🛒 Mi Carrito (<span id="cart-mode-display">RETAIL</span>)</h2>
+            <ul id="cart-items">
+                <li id="empty-cart-message">El carrito está vacío.</li>
+            </ul>
+
+            <div class="cart-summary">
+                <div class="subtotal-row">
+                    <span>Subtotal:</span>
+                    <span id="cart-subtotal">S/ 0.00</span>
+                </div>
+                <div class="total-row">
+                    <span>TOTAL:</span>
+                    <span id="cart-total">S/ 0.00</span>
+                </div>
+            </div>
+
+            <hr style="margin: 15px 0;">
+
+            <h3>Datos de Envío</h3>
+            <form id="checkout-form">
+                <input type="text" id="nombre" placeholder="Nombre Completo" required>
+                <input type="tel" id="telefono" placeholder="Teléfono de contacto (+51...)" required pattern="[0-9]{9,15}">
+                <input type="email" id="email" placeholder="Correo Electrónico (Opcional)">
+                <textarea id="direccion" placeholder="Dirección de Envío Completa" rows="2" required></textarea>
+                <textarea id="detalles" placeholder="Notas/Detalles Adicionales (Ej: Horario de entrega)" rows="2"></textarea>
+                
+                <button type="submit" class="checkout-button">
+                    Generar Pedido por WhatsApp
+                </button>
+            </form>
+            <p style="font-size: 0.8em; color: gray; text-align: center; margin-top: 10px;">
+                *El pedido se enviará a WhatsApp **+51 936403461** para la gestión final y registro.
+            </p>
+        </aside>
+    </div>
+
+    <script>
+        // Lógica JavaScript
+        const PRODUCTS = [
+            { 
+                id: 1, 
+                name: "Zapatillas Deportivas UltraFit", 
+                image: "https://via.placeholder.com/300x200?text=Zapatillas+UltraFit", 
+                stock: 50,
+                priceB2C: 159.90, 
+                priceB2B: 99.50, 
+                minB2B: 10,
+                discountB2C: 0, 
+                discountB2B: 0.15 // 15% descuento adicional B2B por volumen
+            },
+            { 
+                id: 2, 
+                name: "Audífonos Inalámbricos ProSound", 
+                image: "https://via.placeholder.com/300x200?text=Audifonos+ProSound", 
+                stock: 120,
+                priceB2C: 85.00, 
+                priceB2B: 50.00, 
+                minB2B: 20,
+                discountB2C: 0.10, // 10% descuento B2C
+                discountB2B: 0 
+            },
+            { 
+                id: 3, 
+                name: "Mochila Ergonómica Travel", 
+                image: "https://via.placeholder.com/300x200?text=Mochila+Travel", 
+                stock: 75,
+                priceB2C: 120.50, 
+                priceB2B: 78.00, 
+                minB2B: 5,
+                discountB2C: 0, 
+                discountB2B: 0 
+            }
+        ];
+
+        let cart = [];
+        let globalMode = 'B2C'; // Modo inicial: B2C (Retail)
+        const WA_PHONE = '51936403461'; // Número de WhatsApp Perú
+
+        const productListEl = document.getElementById('product-list');
+        const cartItemsEl = document.getElementById('cart-items');
+        const cartSubtotalEl = document.getElementById('cart-subtotal');
+        const cartTotalEl = document.getElementById('cart-total');
+        const emptyCartMessageEl = document.getElementById('empty-cart-message');
+        const cartModeDisplayEl = document.getElementById('cart-mode-display');
+        const checkoutForm = document.getElementById('checkout-form');
+        const toggleB2C = document.getElementById('toggle-b2c');
+        const toggleB2B = document.getElementById('toggle-b2b');
+
+        // --- FUNCIONES DE LÓGICA DE PRECIOS Y STOCK ---
+
+        /** Calcula el precio final basado en el modo y la cantidad. */
+        function calculatePrice(product, mode, quantity = 1) {
+            let basePrice = mode === 'B2B' ? product.priceB2B : product.priceB2C;
+            let discount = mode === 'B2B' ? product.discountB2B : product.discountB2C;
+            
+            // Aplicar descuento por volumen B2B
+            if (mode === 'B2B' && quantity >= product.minB2B) {
+                basePrice = basePrice * (1 - product.discountB2B);
+            } else if (mode === 'B2C') {
+                basePrice = basePrice * (1 - product.discountB2C);
+            }
+
+            return parseFloat(basePrice.toFixed(2));
+        }
+
+        /** Renderiza la lista de productos */
+        function renderProducts() {
+            productListEl.innerHTML = '';
+            PRODUCTS.forEach(product => {
+                const isB2B = globalMode === 'B2B';
+                const currentPrice = calculatePrice(product, globalMode);
+                const originalPrice = isB2B ? product.priceB2B : product.priceB2C;
+
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>Stock: <strong style="color: ${product.stock > 10 ? 'var(--color-accent)' : 'red'};">${product.stock}</strong> u.</p>
+                    
+                    <div class="price-display">
+                        <span class="${isB2B ? 'b2b-price' : 'b2c-price'}">
+                            S/ ${currentPrice.toFixed(2)}
+                        </span>
+                        ${isB2B && product.discountB2B > 0 && product.minB2B > 0 ? `<span class="discount-badge">Volumen ${product.discountB2B * 100}% OFF</span>` : 
+                          !isB2B && product.discountB2C > 0 ? `<span class="discount-badge">${product.discountB2C * 100}% OFF</span>` : ''}
+                    </div>
+
+                    ${isB2B ? `<p style="font-size:0.9em; color: var(--color-b2b);">*Mínimo B2B: ${product.minB2B} u.</p>` : ''}
+                    
+                    <input type="number" id="qty-${product.id}" value="${isB2B ? product.minB2B : 1}" min="${isB2B ? product.minB2B : 1}" max="${product.stock}" style="width: 100px; text-align: center; padding: 5px; border: 1px solid #ccc; border-radius: 4px;">
+                    
+                    <button class="add-to-cart" onclick="addToCart(${product.id}, document.getElementById('qty-${product.id}').value)">
+                        Añadir al Carrito (${globalMode})
+                    </button>
+                `;
+                productListEl.appendChild(card);
+            });
+        }
+
+        /** Cambia el modo global (B2C/B2B) y re-renderiza la UI */
+        function setGlobalMode(mode) {
+            globalMode = mode;
+            cart = []; // Vaciar carrito al cambiar de modo, como en una app real.
+            renderProducts();
+            renderCart();
+            cartModeDisplayEl.textContent = mode;
+            
+            // Actualizar botones del header
+            toggleB2C.classList.remove('active');
+            toggleB2B.classList.remove('active');
+            if (mode === 'B2C') {
+                toggleB2C.classList.add('active');
+                document.querySelector('header').style.borderBottom = '5px solid var(--color-b2c)';
+                document.querySelector('.checkout-button').style.backgroundColor = 'var(--color-b2c)';
+
+            } else {
+                toggleB2B.classList.add('active');
+                document.querySelector('header').style.borderBottom = '5px solid var(--color-b2b)';
+                document.querySelector('.checkout-button').style.backgroundColor = 'var(--color-b2b)';
+            }
+        }
+
+        // --- FUNCIONES DE LÓGICA DEL CARRITO ---
+
+        /** Añade o actualiza un producto al carrito */
+        function addToCart(productId, quantityInput) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            const quantity = parseInt(quantityInput);
+            
+            if (quantity <= 0 || isNaN(quantity)) {
+                alert("Por favor, ingresa una cantidad válida.");
+                return;
+            }
+
+            if (globalMode === 'B2B' && quantity < product.minB2B) {
+                alert(`Para pedidos Mayoristas (B2B), el mínimo para ${product.name} es ${product.minB2B} unidades.`);
+                return;
+            }
+
+            if (quantity > product.stock) {
+                 alert(`Solo quedan ${product.stock} unidades en stock de ${product.name}.`);
+                return;
+            }
+            
+            const existingItemIndex = cart.findIndex(item => item.id === productId && item.mode === globalMode);
+            const finalPrice = calculatePrice(product, globalMode, quantity);
+
+            if (existingItemIndex > -1) {
+                // Actualizar cantidad si ya existe
+                cart[existingItemIndex].quantity = quantity;
+                cart[existingItemIndex].pricePerUnit = finalPrice;
+            } else {
+                // Añadir nuevo item
+                cart.push({
+                    id: productId,
+                    name: product.name,
+                    quantity: quantity,
+                    mode: globalMode,
+                    pricePerUnit: finalPrice,
+                    stock: product.stock, // Stock actual
+                    minB2B: product.minB2B || 1 // Mínimo B2B
+                });
+            }
+
+            renderCart();
+            alert(`✅ ${quantity}x ${product.name} añadido al carrito (${globalMode}).`);
+        }
+
+        /** Renderiza el contenido del carrito */
+        function renderCart() {
+            cartItemsEl.innerHTML = '';
+            let subtotal = 0;
+
+            if (cart.length === 0) {
+                emptyCartMessageEl.classList.remove('hidden');
+            } else {
+                emptyCartMessageEl.classList.add('hidden');
+                cart.forEach(item => {
+                    const totalItemPrice = item.pricePerUnit * item.quantity;
+                    subtotal += totalItemPrice;
+
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div class="item-details">
+                            <strong>${item.name}</strong>
+                            <span class="${item.mode.toLowerCase()}-label price-type">(${item.mode})</span>
+                            <p style="margin: 0; font-size: 0.9em;">S/ ${item.pricePerUnit.toFixed(2)} c/u</p>
+                        </div>
+                        <div class="item-quantity">
+                             <input type="number" value="${item.quantity}" min="${item.mode === 'B2B' ? item.minB2B : 1}" max="${item.stock}" 
+                                 onchange="updateCartQuantity(${item.id}, this.value)">
+                            <p style="margin: 0; font-size: 0.9em; font-weight: bold;">S/ ${totalItemPrice.toFixed(2)}</p>
+                        </div>
+                        <button class="remove-item" onclick="removeItem(${item.id})">🗑️</button>
+                    `;
+                    cartItemsEl.appendChild(listItem);
+                });
+            }
+
+            // Simulación de envío (Delivery)
+            const deliveryCost = subtotal > 0 ? 15.00 : 0.00; // Ejemplo: S/ 15.00 de envío si hay algo en el carrito
+            const total = subtotal + deliveryCost;
+
+            cartSubtotalEl.textContent = `S/ ${subtotal.toFixed(2)}`;
+            cartTotalEl.textContent = `S/ ${total.toFixed(2)} (Incl. Envío S/${deliveryCost.toFixed(2)})`;
+        }
+        
+        /** Actualiza la cantidad de un ítem en el carrito */
+        function updateCartQuantity(productId, newQuantity) {
+            const index = cart.findIndex(item => item.id === productId && item.mode === globalMode);
+            const product = PRODUCTS.find(p => p.id === productId);
+            const quantity = parseInt(newQuantity);
+
+            if (index > -1) {
+                if (quantity <= 0 || isNaN(quantity)) {
+                    alert("Por favor, ingresa una cantidad válida.");
+                    renderCart(); // Re-renderizar para restaurar valor
+                    return;
+                }
+                if (globalMode === 'B2B' && quantity < product.minB2B) {
+                    alert(`Para pedidos Mayoristas (B2B), el mínimo para ${product.name} es ${product.minB2B} unidades.`);
+                    cart[index].quantity = product.minB2B; // Restaurar al mínimo
+                } else if (quantity > product.stock) {
+                    alert(`Solo quedan ${product.stock} unidades en stock de ${product.name}.`);
+                    cart[index].quantity = product.stock; // Restaurar al máximo
+                } else {
+                    cart[index].quantity = quantity;
+                    // Recalcular precio unitario por si aplica descuento por volumen
+                    cart[index].pricePerUnit = calculatePrice(product, globalMode, quantity);
+                }
+                renderCart();
+            }
+        }
+
+        /** Remueve un ítem del carrito */
+        function removeItem(productId) {
+            cart = cart.filter(item => !(item.id === productId && item.mode === globalMode));
+            renderCart();
+        }
+
+        // --- FUNCIÓN DE CHECKOUT A WHATSAPP ---
+
+        checkoutForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (cart.length === 0) {
+                alert("El carrito está vacío. ¡Añade productos para continuar!");
+                return;
+            }
+
+            const nombre = document.getElementById('nombre').value;
+            const telefono = document.getElementById('telefono').value;
+            const email = document.getElementById('email').value || 'No especificado';
+            const direccion = document.getElementById('direccion').value;
+            const detalles = document.getElementById('detalles').value || 'Ninguna.';
+
+            let subtotal = 0;
+            let orderDetails = `*🛒 NUEVO PEDIDO ${globalMode} - T&J Digital*\n\n`;
+            
+            cart.forEach((item, index) => {
+                const totalItemPrice = item.pricePerUnit * item.quantity;
+                subtotal += totalItemPrice;
+                orderDetails += `${index + 1}. ${item.quantity}x ${item.name} (${item.mode}) - S/ ${totalItemPrice.toFixed(2)} (S/ ${item.pricePerUnit.toFixed(2)} c/u)\n`;
+            });
+            
+            const deliveryCost = subtotal > 0 ? 15.00 : 0.00;
+            const total = subtotal + deliveryCost;
+
+            orderDetails += `\n--- RESUMEN ---\n`;
+            orderDetails += `Subtotal: S/ ${subtotal.toFixed(2)}\n`;
+            orderDetails += `Costo Envío: S/ ${deliveryCost.toFixed(2)}\n`;
+            orderDetails += `*TOTAL FINAL: S/ ${total.toFixed(2)}*\n\n`;
+            
+            orderDetails += `--- DATOS DEL CLIENTE ---\n`;
+            orderDetails += `*Nombre:* ${nombre}\n`;
+            orderDetails += `*Teléfono:* ${telefono}\n`;
+            orderDetails += `*Email:* ${email}\n`;
+            orderDetails += `*Dirección:* ${direccion}\n`;
+            orderDetails += `*Detalles Adicionales:* ${detalles}\n\n`;
+
+            orderDetails += `_Por favor, confirma el stock y las condiciones de pago con este agente. ¡Gracias!_`;
+
+            const encodedMessage = encodeURIComponent(orderDetails);
+            const whatsappURL = `https://wa.me/${WA_PHONE}?text=${encodedMessage}`;
+
+            // Simulación de envío a Google Sheets (Mensaje al usuario)
+            const sheetsMessage = '🔗 *SIMULACIÓN DE REGISTRO EN EXCEL/DRIVE:*\nEl pedido se ha generado correctamente en WhatsApp. En un entorno real, la data de este formulario y pedido se enviaría *automáticamente* a una hoja de Google Sheets (Excel) usando Google Apps Script para el Coordinador de Dropshipping y la gestión B2B.';
+            console.log(sheetsMessage);
+            alert(sheetsMessage);
+            
+            window.open(whatsappURL, '_blank');
+        });
+
+
+        // --- INICIALIZACIÓN ---
+        
+        // Inicializar la vista
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            renderCart();
+            // Asegurar que el botón B2C esté activo al inicio
+            setGlobalMode('B2C'); 
+        });
+
+    </script>
+</body>
+</html>
